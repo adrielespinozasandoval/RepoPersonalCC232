@@ -7,9 +7,6 @@
 #include <ostream>
 #include <stdexcept>
 
-#include <iostream>
-#include <string>
-
 #include "Treap.h"
 #include "Traits.h"
 
@@ -56,10 +53,29 @@ struct PrintableIt {
     }
 };
 
-template <typename T, typename DataContainer, typename Compare = std::greater<T>, template <typename ...> class Container = std::vector>
+template <typename T, typename DataContainer, typename Compare = std::less<T>, template <typename ...> class Container = std::vector>
 class LeastElements {
     static_assert(traits::is_valid_comp_v<T, Compare>, "Compare must be valid comparator");
     static_assert(traits::is_iterable_v<DataContainer>, "DataContainer must be iterable");
+
+    using DataContainerIt = decltype(std::begin(std::declval<const DataContainer&>()));
+    using DCItWrapper = PrintableIt<DataContainerIt>;
+    struct TreapComparator {
+        Compare comp;
+        TreapComparator(const Compare& c = Compare{}) : comp(c) {}
+        
+        bool operator()(const DCItWrapper &a, const DCItWrapper &b) const {
+            return (*a == *b) ? diff(a, b) > 0 : comp(*a, *b);
+        }
+    };
+
+    const std::size_t m_;
+    const std::size_t k_;
+    const DataContainerIt end;
+    DataContainerIt it;
+    const TreapComparator treap_comp;
+    Treap<DCItWrapper, TreapComparator> window_;
+    Treap<DCItWrapper, TreapComparator> least_;
 
     template <typename V>
     static inline constexpr std::size_t to_size_t(V value) {return static_cast<std::size_t>(value);}
@@ -74,58 +90,56 @@ class LeastElements {
     static inline typename std::iterator_traits<Iterator>::difference_type diff(Iterator a, Iterator b) {return std::distance(a, b);}
 
     public:
-    explicit LeastElements(const DataContainer& data, std::size_t m, std::size_t k, const Compare &comp = {}) {
+    void nextLeast() {
+        if (it == end)
+            return;
+        
+        auto expIt = it - m_;
+        if (!least_.remove(expIt)) {
+            window_.remove(expIt);
+        }
+        window_.insert(it);
+
+        if (least_.size() < k_) {
+            auto cIt = *window_.minIt();
+            window_.remove(cIt);
+            least_.insert(cIt);
+        }
+        if (window_.size() > 0 && least_.size() > 0) {
+            auto minIt = *window_.minIt();
+            auto maxIt = *least_.maxIt();
+            
+            if(treap_comp(minIt, maxIt)) {
+                window_.remove(minIt);
+                least_.remove(maxIt);
+                window_.insert(maxIt);
+                least_.insert(minIt);
+            }
+        }
+        ++it;
+    }
+    
+    const auto &window() const {
+        return window_;
+    }
+    const auto &least() const {
+        return least_;
+    }
+    
+    explicit LeastElements(const DataContainer &data, std::size_t m, std::size_t k, Compare comp = {}):
+        m_(m), k_(k), treap_comp(comp), window_(treap_comp), least_(treap_comp), end(std::end(data)), it(std::begin(data) + m) {
         if (m < k || to_size_t(std::distance(std::begin(data), std::end(data))) < m)
             throw std::logic_error("k <= m <= data.size() = n");
 
-        using DataContainerIt = decltype(std::begin(data));
-        using DCItWrapper = PrintableIt<DataContainerIt>;
-
-        auto treap_comp = [&comp](const DCItWrapper &a, const DCItWrapper &b) {
-            if (*a == *b)
-                return diff(a, b) > 0;
-            return comp(*a, *b);
-        };
-        Treap<DCItWrapper, decltype(treap_comp)> window(treap_comp);
-        Treap<DCItWrapper, decltype(treap_comp)> least(treap_comp);
-
-        for (auto it = std::begin(data); it != std::begin(data) + m; ++it) {
-            window.insert(it);
-        }
+        for (auto dIt = std::begin(data); dIt != std::begin(data) + m; ++dIt)
+            window_.insert(dIt);
         for (std::size_t j = 0; j < k; ++j) {
-            auto minIt = window.minNode()->value;
-            window.remove(minIt);
-            least.insert(minIt);
-        }
-    
-        for (auto it = std::begin(data) + m; it != std::end(data); ++it) {
-            auto expIt = it - m;
-            if (!least.remove(expIt)) {
-                window.remove(expIt);
-            }
-            window.insert(it);
-
-            if (least.size() < k) {
-                auto cIt = window.minNode()->value;
-                window.remove(cIt);
-                least.insert(cIt);
-            }
-            if (window.size() > 0 && least.size() > 0) {
-                auto minIt = window.minNode()->value;
-                auto maxIt = least.maxNode()->value;
-                
-                if(treap_comp(minIt, maxIt)) {
-                    window.remove(minIt);
-                    least.remove(maxIt);
-                    window.insert(maxIt);
-                    least.insert(minIt);
-                }
-            }
-
-            std::cout << "Window: " << std::endl << window << std::endl;
-            std::cout << "Least: " << std::endl << least << std::endl;
+            auto minIt = *window_.minIt();
+            window_.remove(minIt);
+            least_.insert(minIt);
         }
     }
+    ~LeastElements() = default;
 };
 
 } // namespace cc232

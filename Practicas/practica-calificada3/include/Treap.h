@@ -33,10 +33,12 @@ class Treap {
     static_assert(traits::is_generator_v<PriorityGen>, "PriorityGen must be generator");
 
     using gen_t = decltype(std::declval<PriorityGen&>()());
+    static_assert(traits::is_less_comparable_v<gen_t>, "Generator type must be comparable with < operator");
+
     public: struct Node; private:
 
     Node *root_ = nullptr;
-    Compare comp_ = {};
+    const Compare comp_ = {};
     PriorityGen prg_ = {};
     std::size_t size_ = 0;
 
@@ -129,7 +131,8 @@ class Treap {
                 root_ = node->parent;
         }
     }
-    Node *findM(const T &value) {
+
+    Node *findM(const T &value) const {
         Node *curr = root_, *prev = nullptr;
         while (curr) {
             prev = curr;
@@ -142,7 +145,7 @@ class Treap {
         }
         return prev;
     }
-    Node *findEqM(const T &value) {
+    Node *findEqM(const T &value) const {
         Node *curr = root_;
         while (curr) {
             if (comp_(curr->value, value))
@@ -154,8 +157,38 @@ class Treap {
         }
         return nullptr;
     }
+    Node *minNode(Node *node) const {
+        while (node && node->left)
+            node = node->left;
+        return node;
+    }
+    Node *maxNode(Node *node) const {
+        while (node && node->right)
+            node = node->right;
+        return node;
+    }
+    Node *nextM(Node *node) const {
+        if (!node)
+            return nullptr;
+        if (node->right)
+            return minNode(node->right);
+        Node *curr = node, *prev = node->parent;
+        while (prev && prev->right == curr)
+            curr = prev, prev = prev->parent;
+        return prev;
+    }
+    Node *prevM(Node *node) const {
+        if (!node)
+            return nullptr;
+        if (node->left)
+            return maxNodeM(node->left);
+        Node *curr = node, *prev = node->parent;
+        while (prev && prev->left == curr)
+            curr = prev, prev = prev->parent;
+        return prev;
+    }
     
-    bool isBST(Node *node, const T *min, const T *max) {
+    bool isBST(Node *node, const T *min, const T *max) const {
         if (!node)
             return true;
         if ((min && !comp_(*min, node->value)) || (max && !comp_(node->value, *max)))
@@ -201,9 +234,41 @@ class Treap {
         inline bool isLeftChild() const {return parent && parent->left == this;}
         inline bool isRightChild() const {return parent && parent->right == this;}
 
+        private:
+        friend class Treap;
+
         Node() = default;
         Node(const T &v, gen_t pr, Node *p = nullptr): value(v), priority(pr), parent(p) {}
     };
+    struct const_iterator {
+        using iterator_category = std::bidirectional_iterator_tag;
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using reference = const T&;
+        using pointer = const T*;
+
+        reference operator*() const {return curr->value;}
+        pointer operator->() const {return &(curr->value);}
+        const_iterator &operator++() {
+            curr = treap->nextM(curr);
+            return *this;
+        }
+        const_iterator &operator--() {
+            curr = treap->prevM(curr);
+            return *this;
+        }
+        bool operator ==(const const_iterator& other) const {return curr == other.curr;}
+        bool operator !=(const const_iterator& other) const {return curr != other.curr;}
+
+        private:
+        friend class Treap;
+
+        Node *curr;
+        const Treap* const treap;
+
+        const_iterator(Node *curr, const Treap *treap): curr(curr), treap(treap) {}
+    };
+    using iterator = const_iterator;
 
     bool insert(const T &value, gen_t priority) {
         Node *node = new Node(value, priority);
@@ -253,17 +318,17 @@ class Treap {
     inline const Node *findEq(const T &value) const {
         return findEqM(value);
     }
-    const Node *minNode() const {
-        Node *curr = root_;
-        while (curr && curr->left)
-            curr = curr->left;
-        return curr;
+    static inline iterator minIt(iterator &it) {
+        return iterator(it.treap->minNode(it.curr), it.treap);
     }
-    const Node *maxNode() const {
-        Node *curr = root_;
-        while (curr && curr->right)
-            curr = curr->right;
-        return curr;
+    inline iterator minIt() const {
+        return iterator(minNode(root_), this);
+    }
+    static inline iterator maxIt(iterator &it) {
+        return iterator(it.treap->maxNode(it.curr), it.treap);
+    }
+    inline iterator maxIt() const {
+        return iterator(maxNode(root_), this);
     }
     inline bool isBST() const {
         return isBST(root_, nullptr, nullptr) && checkParents(root_, nullptr);
@@ -284,6 +349,18 @@ class Treap {
     inline bool empty() const noexcept {
         return size_ == 0;
     }
+    inline iterator begin() const {
+        return cbegin();
+    }
+    inline iterator end() const {
+        return cend();
+    }
+    inline iterator cbegin() const {
+        return minIt();
+    }
+    inline iterator cend() const {
+        return iterator(nullptr, this);
+    }
 
     Treap() {}
     explicit Treap(Compare comp): comp_(std::move(comp)) {}
@@ -303,7 +380,7 @@ class Treap {
 
     std::string toString() const {
         if (!root_)
-            return "(empty)\n";
+            return "(empty)";
 
         std::stringstream out;
         std::string prefix = "";
