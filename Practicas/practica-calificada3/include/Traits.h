@@ -12,24 +12,14 @@ namespace cc232 {
         template <typename T, typename Compare>
         static constexpr bool is_valid_comp_v = is_valid_comp<T, Compare>::value;
 
-        template <typename It, typename = void>
-        struct is_random_access_iterator: std::true_type {};
-        template <typename It>
-        struct is_random_access_iterator<It, std::void_t<typename std::iterator_traits<It>::iterator_category>>:
-            std::is_base_of<std::random_access_iterator_tag, typename std::iterator_traits<It>::iterator_category> {};
-        template <typename It>
-        static constexpr bool is_random_access_iterator_v = is_random_access_iterator<It>::value;
-
-        template <typename Container, typename = void>
-        struct is_stack_like: std::false_type {};
-        template <typename Container>
-        struct is_stack_like<Container, std::void_t<
-            decltype(std::declval<Container&>().push_back(std::declval<typename Container::value_type>())),
-            decltype(std::declval<Container&>().pop_back()),
-            decltype(std::declval<Container&>().clear())
+        template <typename Gen, typename = void>
+        struct is_generator: std::false_type {};
+        template <typename Gen>
+        struct is_generator<Gen, std::void_t<
+            decltype(std::declval<Gen&>()())
         >>: std::true_type {};
-        template <typename Container>
-        static constexpr bool is_stack_like_v = is_stack_like<Container>::value;
+        template <typename Gen>
+        static constexpr bool is_generator_v = is_generator<Gen>::value;
 
         template <typename Iterator, typename = void>
         struct is_iterator: std::false_type {};
@@ -53,18 +43,6 @@ namespace cc232 {
         >>: std::integral_constant<bool, is_iterator_v<decltype(std::begin(std::declval<Container&>()))>> {};
         template <typename Container>
         static constexpr bool is_iterable_v = is_iterable<Container>::value;
-
-        template <typename Container, typename = void>
-        struct has_random_access_iterator: std::false_type {};
-        template <typename Container>
-        struct has_random_access_iterator<Container, std::void_t<
-            decltype(std::begin(std::declval<const Container&>())),
-            decltype(std::end(std::declval<const Container&>())),
-            decltype(std::cbegin(std::declval<const Container&>())),
-            decltype(std::cend(std::declval<const Container&>()))
-        >>: std::integral_constant<bool, is_random_access_iterator_v<decltype(std::begin(std::declval<const Container&>()))>> {};
-        template <typename Container>
-        static constexpr bool has_random_access_iterator_v = has_random_access_iterator<Container>::value;
     };
 
 } // namespace cc232
