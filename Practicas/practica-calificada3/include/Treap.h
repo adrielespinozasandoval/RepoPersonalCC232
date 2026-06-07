@@ -38,7 +38,7 @@ class Treap {
     public: struct Node; private:
 
     Node *root_ = nullptr;
-    const Compare comp_ = {};
+    Compare comp_ = {};
     PriorityGen prg_ = {};
     std::size_t size_ = 0;
 
@@ -181,7 +181,7 @@ class Treap {
         if (!node)
             return nullptr;
         if (node->left)
-            return maxNodeM(node->left);
+            return maxNode(node->left);
         Node *curr = node, *prev = node->parent;
         while (prev && prev->left == curr)
             curr = prev, prev = prev->parent;
@@ -264,7 +264,7 @@ class Treap {
         friend class Treap;
 
         Node *curr;
-        const Treap* const treap;
+        const Treap *treap;
 
         const_iterator(Node *curr, const Treap *treap): curr(curr), treap(treap) {}
     };
@@ -286,15 +286,12 @@ class Treap {
         if (!node)
             return false;
         percolateDown(node);
-        Node *child = node->left ? node->left : node->right;
         if (node == root_)
-            root_ = child;
+            root_ = nullptr;
         else if (node->isLeftChild())
-            node->parent->left = child;
+            node->parent->left = nullptr;
         else
-            node->parent->right = child;
-        if (child)
-            child->parent = node->parent;
+            node->parent->right = nullptr;
         delete node;
         --size_;
         return true;

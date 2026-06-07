@@ -53,7 +53,7 @@ struct PrintableIt {
     }
 };
 
-template <typename T, typename DataContainer, typename Compare = std::less<T>, template <typename ...> class Container = std::vector>
+template <typename T, typename DataContainer, typename Compare = std::less<T>>
 class LeastElements {
     static_assert(traits::is_valid_comp_v<T, Compare>, "Compare must be valid comparator");
     static_assert(traits::is_iterable_v<DataContainer>, "DataContainer must be iterable");
@@ -85,7 +85,7 @@ class LeastElements {
         typename std::iterator_traits<Iterator>::iterator_category>, int> = 0>
     static inline typename std::iterator_traits<Iterator>::difference_type diff(Iterator a, Iterator b) {return b - a;}
     template <class Iterator, std::enable_if_t<!std::is_base_of_v<
-        std::bidirectional_iterator_tag,
+        std::random_access_iterator_tag,
         typename std::iterator_traits<Iterator>::iterator_category>, int> = 0>
     static inline typename std::iterator_traits<Iterator>::difference_type diff(Iterator a, Iterator b) {return std::distance(a, b);}
 
@@ -126,9 +126,10 @@ class LeastElements {
         return sum;
     }
     T sumAndSlide() {
+        T sum = sumLeast();
         if (it != end)
             slideWindow();
-        return sumLeast();
+        return sum;
     }
     
     const auto &window() const {
@@ -140,7 +141,7 @@ class LeastElements {
     
     explicit LeastElements(const DataContainer &data, std::size_t m, std::size_t k, Compare comp = {}):
         m_(m), k_(k), treap_comp(comp), window_(treap_comp), least_(treap_comp), end(std::end(data)), it(std::begin(data) + m) {
-        if (m < k || to_size_t(std::distance(std::begin(data), std::end(data))) < m)
+        if (m < k || to_size_t(diff(std::begin(data), std::end(data))) < m)
             throw std::logic_error("Condition k <= m <= data.size() = n is not met");
 
         for (auto dIt = std::begin(data); dIt != std::begin(data) + m; ++dIt)
