@@ -375,11 +375,11 @@ class Treap {
 
     std::string toString() const {
         if (!root_)
-            return "(empty)";
+            return "(empty)\n";
 
         std::stringstream out;
         std::string prefix = "";
-        out << "[" << root_->value << "| p:" << root_->priority << "]" << std::endl;
+        out << "(" << root_->value << "| p:" << root_->priority << ")" << std::endl;
         if (root_->left)
             buildStr(root_->left, prefix, root_->right == nullptr, out);
         if (root_->right)
