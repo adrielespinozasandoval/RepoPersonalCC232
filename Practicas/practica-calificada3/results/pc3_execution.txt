@@ -1,0 +1,40 @@
+Least Elements demo:
+=========== EXECUTED COMMANDS ===========
+
+$ cmake -S . -B build
+$ cmake --build build
+$ build/pc3_demo_leastelements
+
+============ TERMINAL OUTPUT ============
+
+======================================================
+
+Dataset : [ 41 56 17 82 59 76 15 ]
+Config  : Window (m) = 5 | Least to sum (k) = 2
+
+Step 1  : Window [0 -> 4]
+------------------------------------------------------
+Array   : [ 41 56 17 82 59 76 15 ]
+Least 2 : { 17 41 }  =>  Sum: 58
+
+Step 2  : Window [1 -> 5]
+------------------------------------------------------
+Array   : [ 41 56 17 82 59 76 15 ]
+Least 2 : { 17 56 }  =>  Sum: 73
+
+Step 3  : Window [2 -> 6]
+------------------------------------------------------
+Array   : [ 41 56 17 82 59 76 15 ]
+Least 2 : { 15 17 }  =>  Sum: 32
+
+======================================================
+
+Treap demo:
+=========== EXECUTED COMMANDS ===========
+
+$ cmake -S . -B build
+$ cmake --build build
+$ build/pc3_demo_treap
+
+============ TERMINAL OUTPUT ============
+

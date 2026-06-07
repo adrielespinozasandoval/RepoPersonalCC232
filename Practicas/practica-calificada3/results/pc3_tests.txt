@@ -1,0 +1,9 @@
+=========== EXECUTED COMMANDS ===========
+
+$ cmake -S . -B build
+$ cmake --build build
+$ build/pc3_test_public
+
+============ TERMINAL OUTPUT ============
+
+All tests passed!
