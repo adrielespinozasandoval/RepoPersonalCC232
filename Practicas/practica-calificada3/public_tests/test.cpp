@@ -14,17 +14,19 @@ int main() {
     for (auto it : res.window()) { std::cout << *it << " "; } 
     std::cout << "\nLeast:  ";
     for (auto it : res.least()) { std::cout << *it << " "; }
+    std::cout << "\nSum: " << res.sumLeast();
     std::cout << "\n----------------------\n";
 
     std::size_t slides = vec.size() - m;
     for (std::size_t i = 0; i < slides; ++i) {
-        res.nextLeast();
+        res.slideWindow();
         
         std::cout << "--- Slide " << i + 1 << " ---" << std::endl;
         std::cout << "Window: ";
         for (auto it : res.window()) { std::cout << *it << " "; }
         std::cout << "\nLeast:  ";
         for (auto it : res.least()) { std::cout << *it << " "; }
+        std::cout << "\nSum: " << res.sumLeast();
         std::cout << "\n----------------------\n";
     }
 

@@ -90,9 +90,9 @@ class LeastElements {
     static inline typename std::iterator_traits<Iterator>::difference_type diff(Iterator a, Iterator b) {return std::distance(a, b);}
 
     public:
-    void nextLeast() {
+    void slideWindow() {
         if (it == end)
-            return;
+            throw std::logic_error("End of data reached");
         
         auto expIt = it - m_;
         if (!least_.remove(expIt)) {
@@ -118,6 +118,18 @@ class LeastElements {
         }
         ++it;
     }
+    T sumLeast() {
+        static_assert(traits::is_summable_v<T>, "Type must be summable");
+        T sum{};
+        for (auto lIt: least_)
+            sum += *lIt;
+        return sum;
+    }
+    T sumAndSlide() {
+        if (it != end)
+            slideWindow();
+        return sumLeast();
+    }
     
     const auto &window() const {
         return window_;
@@ -129,7 +141,7 @@ class LeastElements {
     explicit LeastElements(const DataContainer &data, std::size_t m, std::size_t k, Compare comp = {}):
         m_(m), k_(k), treap_comp(comp), window_(treap_comp), least_(treap_comp), end(std::end(data)), it(std::begin(data) + m) {
         if (m < k || to_size_t(std::distance(std::begin(data), std::end(data))) < m)
-            throw std::logic_error("k <= m <= data.size() = n");
+            throw std::logic_error("Condition k <= m <= data.size() = n is not met");
 
         for (auto dIt = std::begin(data); dIt != std::begin(data) + m; ++dIt)
             window_.insert(dIt);
