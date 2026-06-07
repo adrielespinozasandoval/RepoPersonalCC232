@@ -27,3 +27,9 @@ cc232_add_le_target(pc3_demo_interactive "demos/demo_interactive.cpp")
 cc232_add_le_target(pc3_test_public "public_tests/test_public.cpp")
 cc232_add_le_target(pc3_test_internal_edge_cases "internal_tests/test_edge_cases.cpp")
 cc232_add_le_target(pc3_test_internal_states "internal_tests/test_states.cpp")
+
+cc232_add_le_target(pc3_bench_leastelements "benchmark/bench_leastelements.cpp")
+
+add_test(NAME pc3_public COMMAND pc3_test_public)
+add_test(NAME pc3_internal_edge_cases COMMAND pc3_test_internal_edge_cases)
+add_test(NAME pc3_internal_states COMMAND pc3_test_internal_states)
