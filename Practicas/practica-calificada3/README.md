@@ -6,6 +6,16 @@
 - **Problema asignado:** 10. AtCoder ABC281 E - Least Elements
 - **Enlace:** https://atcoder.jp/contests/abc281/tasks/abc281_e
 
+## Referencia oficial
+
+- CSV oficial: https://github.com/kapumota/CC-232/blob/main/Practicas/Practica3_CC232/Problemas-Evaluacion3.csv
+
+## Relación con semanas 4-6
+
+- Semana principal: 5
+- Estructura usada: Treap
+- Estructura de la librería `cc232` relacionada: `Treap.h`
+
 ## Descripción
 
 Conocido como `LeastElements` en la implementación de C++17, es una estructura diseñada para extraer y sumar los $k$ menores elementos de una subsecuencia (ventana) que se *desliza*, es decir que va avanzando y añadiendo nuevos elementos mientras los más viejos se van eliminando.
@@ -118,3 +128,10 @@ Para la lista de los targets de demostraciones mirar Targets.
 ### Benchmark
 
 - `pc3_bench_leastelements`
+
+## Declaración de autoría
+
+```
+Declaro que entiendo el código entregado, que puedo explicarlo, compilarlo, ejecutarlo y modificarlo sin ayuda externa durante la grabación.
+También declaro que el repositorio entregado corresponde al trabajo mostrado en el video y que no contiene builds, ejecutables ni archivos generados usados para aparentar funcionamiento.
+```
