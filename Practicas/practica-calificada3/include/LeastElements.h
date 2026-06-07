@@ -53,40 +53,41 @@ struct PrintableIt {
     }
 };
 
-template <typename T, typename DataContainer, typename Compare = std::less<T>>
+template <typename T, typename Iterator, typename Compare = std::less<T>>
 class LeastElements {
     static_assert(traits::is_valid_comp_v<T, Compare>, "Compare must be valid comparator");
-    static_assert(traits::is_iterable_v<DataContainer>, "DataContainer must be iterable");
+    static_assert(traits::is_iterator_v<Iterator>, "Iterator must be valid iterator");
 
-    using DataContainerIt = decltype(std::begin(std::declval<const DataContainer&>()));
-    using DCItWrapper = PrintableIt<DataContainerIt>;
+    using ItWrapper = PrintableIt<Iterator>;
     struct TreapComparator {
         Compare comp;
         TreapComparator(const Compare& c = Compare{}) : comp(c) {}
         
-        bool operator()(const DCItWrapper &a, const DCItWrapper &b) const {
+        bool operator()(const ItWrapper &a, const ItWrapper &b) const {
             return (*a == *b) ? diff(a, b) > 0 : comp(*a, *b);
         }
     };
 
     const std::size_t m_;
     const std::size_t k_;
-    const DataContainerIt end;
-    DataContainerIt it;
+    const Iterator end;
+    Iterator it;
     const TreapComparator treap_comp;
-    Treap<DCItWrapper, TreapComparator> window_;
-    Treap<DCItWrapper, TreapComparator> least_;
+    Treap<ItWrapper, TreapComparator> window_;
+    Treap<ItWrapper, TreapComparator> least_;
 
     template <typename V>
     static inline constexpr std::size_t to_size_t(V value) {return static_cast<std::size_t>(value);}
 
-    template <class Iterator, std::enable_if_t<std::is_base_of_v<
+    template <typename It = Iterator, std::enable_if_t<std::is_base_of_v<
         std::random_access_iterator_tag,
-        typename std::iterator_traits<Iterator>::iterator_category>, int> = 0>
+        typename std::iterator_traits<It>::iterator_category>, int> = 0>
     static inline typename std::iterator_traits<Iterator>::difference_type diff(Iterator a, Iterator b) {return b - a;}
-    template <class Iterator, std::enable_if_t<!std::is_base_of_v<
+    template <typename It = Iterator, std::enable_if_t<!std::is_base_of_v<
         std::random_access_iterator_tag,
-        typename std::iterator_traits<Iterator>::iterator_category>, int> = 0>
+        typename std::iterator_traits<It>::iterator_category> && std::is_base_of_v<
+        std::bidirectional_iterator_tag,
+        typename std::iterator_traits<It>::iterator_category>, int> = 0>
     static inline typename std::iterator_traits<Iterator>::difference_type diff(Iterator a, Iterator b) {return std::distance(a, b);}
 
     public:
@@ -94,7 +95,7 @@ class LeastElements {
         if (it == end)
             throw std::logic_error("End of data reached");
         
-        auto expIt = it - m_;
+        auto expIt = std::prev(it, m_);
         if (!least_.remove(expIt)) {
             window_.remove(expIt);
         }
@@ -139,12 +140,12 @@ class LeastElements {
         return least_;
     }
     
-    explicit LeastElements(const DataContainer &data, std::size_t m, std::size_t k, Compare comp = {}):
-        m_(m), k_(k), treap_comp(comp), window_(treap_comp), least_(treap_comp), end(std::end(data)), it(std::begin(data) + m) {
-        if (m < k || to_size_t(diff(std::begin(data), std::end(data))) < m)
-            throw std::logic_error("Condition k <= m <= data.size() = n is not met");
+    explicit LeastElements(Iterator first, Iterator last, std::size_t m, std::size_t k, Compare comp = {}):
+        m_(m), k_(k), treap_comp(comp), window_(treap_comp), least_(treap_comp), end(last), it(std::next(first, m)) {
+        if (m < k || to_size_t(diff(first, last)) < m)
+            throw std::logic_error("k <= m <= data.size() = n criteria is not met");
 
-        for (auto dIt = std::begin(data); dIt != std::begin(data) + m; ++dIt)
+        for (auto dIt = first; dIt != first + m; ++dIt)
             window_.insert(dIt);
         for (std::size_t j = 0; j < k; ++j) {
             auto minIt = *window_.minIt();
@@ -152,7 +153,20 @@ class LeastElements {
             least_.insert(minIt);
         }
     }
+    template <typename Container>
+    explicit LeastElements(const Container &data, std::size_t m, std::size_t k, Compare comp = {}):
+        LeastElements(std::begin(data), std::end(data), m, k, comp) {
+            static_assert(traits::is_iterable_v<Container>, "Container must be iterable");
+        }
+
     ~LeastElements() = default;
 };
+template <typename Container, typename Compare = std::less<typename Container::value_type>>
+LeastElements(const Container&, std::size_t, std::size_t, Compare = Compare{}) 
+-> LeastElements<
+    typename Container::value_type, 
+    decltype(std::begin(std::declval<const Container&>())), 
+    Compare
+>;
 
 } // namespace cc232

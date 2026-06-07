@@ -35,7 +35,22 @@ class Treap {
     using gen_t = decltype(std::declval<PriorityGen&>()());
     static_assert(traits::is_less_comparable_v<gen_t>, "Generator type must be comparable with < operator");
 
-    public: struct Node; private:
+    struct Node {
+        T value;
+        gen_t priority;
+        Node *left = nullptr;
+        Node *right = nullptr;
+        Node *parent = nullptr;
+
+        inline bool isLeftChild() const {return parent && parent->left == this;}
+        inline bool isRightChild() const {return parent && parent->right == this;}
+
+        private:
+        friend class Treap;
+
+        Node() = default;
+        Node(const T &v, gen_t pr, Node *p = nullptr): value(v), priority(pr), parent(p) {}
+    };
 
     Node *root_ = nullptr;
     Compare comp_ = {};
@@ -223,23 +238,6 @@ class Treap {
     }
 
     public:
-
-    struct Node {
-        T value;
-        gen_t priority;
-        Node *left = nullptr;
-        Node *right = nullptr;
-        Node *parent = nullptr;
-
-        inline bool isLeftChild() const {return parent && parent->left == this;}
-        inline bool isRightChild() const {return parent && parent->right == this;}
-
-        private:
-        friend class Treap;
-
-        Node() = default;
-        Node(const T &v, gen_t pr, Node *p = nullptr): value(v), priority(pr), parent(p) {}
-    };
     struct const_iterator {
         using iterator_category = std::bidirectional_iterator_tag;
         using difference_type = std::ptrdiff_t;
