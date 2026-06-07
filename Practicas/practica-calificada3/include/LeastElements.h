@@ -156,8 +156,8 @@ class LeastElements {
     template <typename Container>
     explicit LeastElements(const Container &data, std::size_t m, std::size_t k, Compare comp = {}):
         LeastElements(std::begin(data), std::end(data), m, k, comp) {
-            static_assert(traits::is_iterable_v<Container>, "Container must be iterable");
-        }
+        static_assert(traits::is_iterable_v<Container>, "Container must be iterable");
+    }
 
     ~LeastElements() = default;
 };
