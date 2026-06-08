@@ -70,3 +70,14 @@ Se añadieron, según rúbrica, la mayoría de las respuestas obligatorias y la 
 
 ### Adición de README
 Se añadió el documento que presenta el proyecto, el estudiante, el ejercicio propuesto, resumen de solución, pasos para compilar e información del repositorio.
+
+## 8 junio 2026
+
+### Adición de video y reto en vivo
+Se realizó el reto en vivo, realizando acciones pedidas por rúbrica incluido el reto grabado obligatorio específico del problema.
+
+### Actualización de `docs/`
+Actualizado `preguntas_obligatorias.md` -> `respuestas_obligatorias.md` para incluir respuestas del reto grabado, y la bitácora.
+
+### Corección menor del README
+Corregido opción del *build type* de CMake.

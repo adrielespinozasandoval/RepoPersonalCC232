@@ -17,12 +17,12 @@
 15. 
 16. Se podría usar dos Heaps, pero requería *lazy deletion* (despreciar los elementos que no están en la ventana) lo cual al largo plazo puede generar un desperdicio de memoria, o en otra solución de jugar con el `Compare` dejar el determinismo y por lo tanto perder la invarianza del heap.
 17. Se escribió más casos de prueba con conjuntos de datos aleatorios como con patrones que estresen el algoritmo.
-18. 
-19. 
+18. Algunas firmas de funciones de Treap y LeastElements, añadido una demo para Treap, la forma de sumar los $k$ menores, haciéndola de $O(k)$ a $O(1)$ y la traza de inserciones y eliminaciones cuando se cambia el elemento frontera (máximo de `least_`)
+19. En el análisis, se observó que cumple la misma semántica (las invariantes no se rompían, el funcionamiento interno seguía cumpliendo). En la práctica se observó que las pruebas públicas e internas seguían funcionando sin dar errores.
 20. Porque se implementó desde cero todas las estructuras utilizadas en la librería, lo cual requiere entender el algoritmo.
 
 ## Preguntas específicas
 
 1. El Treap `least_`
 2. Cuando el valor mínimo de `window_` es menor al máximo de `least_` (frontera)
-3. La suma se actializa cuando algún elemento de `least_` es intercambiado.
+3. La suma se actializa cuando algún elemento de `least_` es añadido, intercambiado o eliminado.

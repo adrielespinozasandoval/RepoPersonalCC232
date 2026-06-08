@@ -65,7 +65,7 @@ A continuación se presenta la compilación en modo de prueba:
 
 **1. Configurar el proyecto**
 ```bash
-cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build-debug -DCMAKE_BUILD_TYPE=Debug
 ```
 
 **2. Compilar los targets**
