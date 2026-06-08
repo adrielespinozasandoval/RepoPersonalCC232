@@ -220,7 +220,7 @@ class Treap {
     static bool isHeap(Node *node) {
         if (!node)
             return true;
-        if (node->left && node->left->priority < node->priority || node->right && node->right->priority < node->priority)
+        if ((node->left && node->left->priority < node->priority) || (node->right && node->right->priority < node->priority))
             return false;
         return isHeap(node->left) && isHeap(node->right);
     }
@@ -307,10 +307,10 @@ class Treap {
         std::swap(prg_, other.prg_);
     }
 
-    inline const Node *find(const T &value) const {
+    inline iterator find(const T &value) const {
         return findM(value);
     }
-    inline const Node *findEq(const T &value) const {
+    inline iterator findEq(const T &value) const {
         return findEqM(value);
     }
     static inline iterator minIt(iterator &it) {
@@ -335,7 +335,7 @@ class Treap {
         return isBST() && isHeap();
     }
 
-    inline const Node *root() const noexcept {
+    inline iterator root() const noexcept {
         return root_;
     }
     inline std::size_t size() const noexcept {
