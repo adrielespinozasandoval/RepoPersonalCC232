@@ -60,6 +60,8 @@ template <typename T, typename Iterator, typename Compare = std::less<T>>
 class LeastElements {
     static_assert(traits::is_valid_comp_v<T, Compare>, "Compare must be valid comparator");
     static_assert(traits::is_iterator_v<Iterator>, "Iterator must be valid iterator");
+    static_assert(traits::is_summable_v<T>, "Type must be summable");
+    static_assert(traits::is_subtractable_v<T>, "Type must be subtractable");
 
     using ItWrapper = LeastElements_traits::PrintableIt<Iterator>;
     struct TreapComparator {

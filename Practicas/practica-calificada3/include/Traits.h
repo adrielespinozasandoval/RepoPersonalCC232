@@ -40,6 +40,15 @@ namespace cc232 {
         template <typename T>
         static constexpr bool is_summable_v = is_summable<T>::value;
 
+        template <typename T, typename = void>
+        struct is_subtractable : std::false_type {};
+        template <typename T>
+        struct is_subtractable<T, std::void_t<
+            decltype(std::declval<T>() - std::declval<T>())
+        >>: std::is_same<decltype(std::declval<T>() - std::declval<T>()), T> {};
+        template <typename T>
+        static constexpr bool is_subtractable_v = is_subtractable<T>::value;
+
         template <typename Iterator, typename = void>
         struct is_iterator: std::false_type {};
         template <typename Iterator>

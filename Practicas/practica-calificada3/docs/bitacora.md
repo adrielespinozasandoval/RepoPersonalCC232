@@ -81,3 +81,6 @@ Actualizado `preguntas_obligatorias.md` -> `respuestas_obligatorias.md` para inc
 
 ### Corección menor del README
 Corregido opción del *build type* de CMake.
+
+### Adición de verificación estática de tipo
+Se añadió `is_substractable_v` ya que en la nueva solución del reto se usa resta para actualizar la suma de los $k$ menores.
