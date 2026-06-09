@@ -87,3 +87,8 @@ Se añadió `is_substractable_v` ya que en la nueva solución del reto se usa re
 
 ### Adición y término de la actividad 4
 Se completó la actividad de clase CC232 de la semana 4.
+
+## 9 junio 2026
+
+### Adición y término de la actividad 5
+Se completó la actividad de clase CC232 de la semana 5.
