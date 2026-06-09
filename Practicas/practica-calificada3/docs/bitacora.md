@@ -84,3 +84,6 @@ Corregido opción del *build type* de CMake.
 
 ### Adición de verificación estática de tipo
 Se añadió `is_substractable_v` ya que en la nueva solución del reto se usa resta para actualizar la suma de los $k$ menores.
+
+### Adición y término de la actividad 4
+Se completó la actividad de clase CC232 de la semana 4.
