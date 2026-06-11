@@ -92,3 +92,12 @@ Se completó la actividad de clase CC232 de la semana 4.
 
 ### Adición y término de la actividad 5
 Se completó la actividad de clase CC232 de la semana 5.
+
+### Segundo avance de la actividad 6
+Se completaron los bloques 1 a 10 de la actividad de clase CC232 de la Semana 6.
+- Se incluyó el código modificado y las salidas al ejecutar lo compilado.
+
+## 10 junio 2026
+
+### Término de la actividad 6
+Se completaron los bloques 11 a 13 de la actividad de clase CC232 de la Semana 6.

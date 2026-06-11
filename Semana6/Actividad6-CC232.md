@@ -22,8 +22,8 @@
 // MOD-A6-B2: Utilidades auxiliares constexpr para evaluar fronteras nodales en O(1)
 inline constexpr bool pqHasLeftChild(std::size_t i, std::size_t n) noexcept {return pqInHeap(pqLeftChild(i), n);}
 inline constexpr bool pqHasRightChild(std::size_t i, std::size_t n) noexcept {return pqInHeap(pqRightChild(i), n);}
-inline constexpr bool pqIsLeaf(std::size_t i, std::size_t n) noexcept {return !(pqHasLeftChild(i, n) || pqHasRightChild(i, n));}
-inline constexpr bool pqIsInternal(std::size_t i, std::size_t n) noexcept {return i != 0 && (pqHasLeftChild(i, n) || pqHasRightChild(i, n));}
+inline constexpr bool pqIsLeaf(std::size_t i, std::size_t n) noexcept {return !(pqHasLeftChild(i, n)||pqHasRightChild(i, n));}
+inline constexpr bool pqIsInternal(std::size_t i, std::size_t n) noexcept {return i != 0 && (pqHasLeftChild(i, n)||pqHasRightChild(i, n));}
 ```
 1. Se refactoriza para evitar tener operaciones aritméticas crudas (`2*i + 1`, `(i-1)/2`) esparcidas por todo el código. Usar funciones descriptivas previene errores de índices fuera de rango y hace que la lógica sea mucho más fácil de leer.
 2. Usar `constexpr` es la alternativa moderna a las macros de C. A diferencia de las macros, `constexpr` respeta el tipado fuerte, los espacios de nombres y se evalúa en tiempo de compilación sin penalizar el rendimiento.
@@ -209,7 +209,7 @@ bool complHeapIsValid(const std::vector<T>& a, Compare comp) {
     for (std::size_t i = 0; i < a.size(); ++i) {
         const std::size_t l = pqLeftChild(i);
         const std::size_t r = pqRightChild(i);
-        if ((pqInHeap(l, a.size()) && comp(a[i], a[l])) || (pqInHeap(r, a.size()) && comp(a[i], a[r])))
+        if ((pqInHeap(l, a.size()) && comp(a[i], a[l]))||(pqInHeap(r, a.size()) && comp(a[i], a[r])))
             return false;
     }
     return true;
@@ -348,8 +348,8 @@ Check check(Node* u) const {
     const Check l = check(u->left);
     const Check r = check(u->right);
 
-    const bool heapOk = (!u->left || !comp_(u->value, u->left->value)) &&
-                        (!u->right || !comp_(u->value, u->right->value));
+    const bool heapOk = (!u->left||!comp_(u->value, u->left->value)) &&
+                        (!u->right||!comp_(u->value, u->right->value));
     const bool leftistOk = l.npl >= r.npl;
     const int expectedNpl = r.npl + 1;
     const bool nplOk = u->npl == expectedNpl;
@@ -370,8 +370,8 @@ bool isValidLeftHeap() const {
 template <typename Heap>
 void printValidation(const Heap& heap, const char* label) {
     std::cout << label
-              << " | size=" << heap.size()
-              << " | valido=" << std::boolalpha
+              << "|size=" << heap.size()
+              << "|valido=" << std::boolalpha
               << heap.isValidLeftHeap()
               << "\n";
 }
@@ -421,23 +421,23 @@ int main() {
 
 ```
 heap A antes del merge: [9, 7, 2]
-validacion A | size=3 | valido=true
+validacion A|size=3|valido=true
 heap B antes del merge: [11, 8, 1, 3]
-validacion B | size=4 | valido=true
+validacion B|size=4|valido=true
 
 Ejecutando A.merge(B)
 heap A despues del merge: [11, 8, 9, 1, 3, 7, 2]
-validacion A despues del merge | size=7 | valido=true
+validacion A despues del merge|size=7|valido=true
 B queda vacio: true
 size de B: 0
-validacion B despues del merge | size=0 | valido=true
+validacion B despues del merge|size=0|valido=true
 
 Ejecutando A.insert(10)
 A despues de insert(10): [11, 8, 10, 1, 3, 9, 7, 2]
-validacion A despues de insert(10) | size=8 | valido=true
+validacion A despues de insert(10)|size=8|valido=true
 
 Extracciones con delMax: 11 10 9 8 7 3 2 1 
-validacion A al final | size=0 | valido=true
+validacion A al final|size=0|valido=true
 ```
 
 1. El Heap izquierdista está diseñado para que la operación fundamental sea mezclar o fusionar (`merge`).
@@ -637,7 +637,7 @@ std::size_t bubbleUpCount(Node* u) {
 // MOD-A6-B10: Seguimiento de rotaciones descendentes pre-corte
 std::size_t trickleDownCount(Node* u) {
     std::size_t rotations = 0;
-    while (u->left || u-> right) {
+    while (u->left||u-> right) {
         if (!u->left)
             rotateLeft(u);
         else if (!u->right)
@@ -700,7 +700,7 @@ void printState(const ods::Treap<int>& t, const std::string& label) {
 
     if (t.root()) {
         std::cout << "raiz: " << t.root()->key
-                  << " | prioridad: " << t.root()->priority << "\n";
+                  << "|prioridad: " << t.root()->priority << "\n";
     } else {
         std::cout << "raiz: null\n";
     }
@@ -714,7 +714,7 @@ void printState(const ods::Treap<int>& t, const std::string& label) {
 void printSearchResult(const std::string& name, const ods::Treap<int>::Node* node) {
     std::cout << name << ": ";
     if (node) {
-        std::cout << node->key << " | prioridad=" << node->priority << "\n";
+        std::cout << node->key << "|prioridad=" << node->priority << "\n";
     } else {
         std::cout << "null\n";
     }
@@ -794,7 +794,7 @@ insertada clave=50 prioridad=50
 estado despues de insertar
 inorden: [50]
 niveles: [50]
-raiz: 50 | prioridad: 50
+raiz: 50|prioridad: 50
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -805,7 +805,7 @@ insertada clave=30 prioridad=30
 estado despues de insertar
 inorden: [30, 50]
 niveles: [30, 50]
-raiz: 30 | prioridad: 30
+raiz: 30|prioridad: 30
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -816,7 +816,7 @@ insertada clave=70 prioridad=70
 estado despues de insertar
 inorden: [30, 50, 70]
 niveles: [30, 50, 70]
-raiz: 30 | prioridad: 30
+raiz: 30|prioridad: 30
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -827,7 +827,7 @@ insertada clave=20 prioridad=20
 estado despues de insertar
 inorden: [20, 30, 50, 70]
 niveles: [20, 30, 50, 70]
-raiz: 20 | prioridad: 20
+raiz: 20|prioridad: 20
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -838,7 +838,7 @@ insertada clave=40 prioridad=40
 estado despues de insertar
 inorden: [20, 30, 40, 50, 70]
 niveles: [20, 30, 40, 50, 70]
-raiz: 20 | prioridad: 20
+raiz: 20|prioridad: 20
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -849,7 +849,7 @@ insertada clave=60 prioridad=60
 estado despues de insertar
 inorden: [20, 30, 40, 50, 60, 70]
 niveles: [20, 30, 40, 50, 60, 70]
-raiz: 20 | prioridad: 20
+raiz: 20|prioridad: 20
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -860,7 +860,7 @@ insertada clave=80 prioridad=80
 estado despues de insertar
 inorden: [20, 30, 40, 50, 60, 70, 80]
 niveles: [20, 30, 40, 50, 60, 70, 80]
-raiz: 20 | prioridad: 20
+raiz: 20|prioridad: 20
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -895,7 +895,7 @@ eliminada clave=50 rotaciones=1
 estado despues de eliminar
 inorden: [20, 30, 40, 60, 70, 80]
 niveles: [20, 30, 40, 60, 70, 80]
-raiz: 20 | prioridad: 20
+raiz: 20|prioridad: 20
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -906,7 +906,7 @@ eliminada clave=20 rotaciones=1
 estado despues de eliminar
 inorden: [30, 40, 60, 70, 80]
 niveles: [30, 40, 60, 70, 80]
-raiz: 30 | prioridad: 30
+raiz: 30|prioridad: 30
 isBST: true
 isHeapByPriority: true
 isTreap: true
@@ -917,40 +917,426 @@ eliminada clave=70 rotaciones=1
 estado despues de eliminar
 inorden: [30, 40, 60, 80]
 niveles: [30, 40, 60, 80]
-raiz: 30 | prioridad: 30
+raiz: 30|prioridad: 30
 isBST: true
 isHeapByPriority: true
 isTreap: true
 parent_links: true
 
 Bloque 10 - Parte D: busqueda ordenada
-findEQ(40): 40 | prioridad=40
+findEQ(40): 40|prioridad=40
 findEQ(35): null
-lowerBound(35): 40 | prioridad=40
-lowerBound(40): 40 | prioridad=40
-upperBound(40): 50 | prioridad=50
-upperBound(75): 80 | prioridad=80
+lowerBound(35): 40|prioridad=40
+lowerBound(40): 40|prioridad=40
+upperBound(40): 50|prioridad=50
+upperBound(75): 80|prioridad=80
 ```
 
-**Parte A y B:**
-1. Las prioridades solo deciden quién va más arriba o abajo (vertical). El orden lateral siempre respeta las reglas clásicas del BST (menores a la izquierda, mayores a la derecha).
-2. La raíz termina siendo el elemento al que la función aleatoria le asignó la mayor prioridad (o menor, dependiendo del comparador) de todo el conjunto.
-3. Al insertarse inicialmente como hoja en un BST, si su prioridad aleatoria es más alta que la de su padre, debe aplicar un reacomodo hacia arriba (`bubbleUp`).
-4. Para subir de nivel sin romper el orden lateral, usa rotaciones (`rotateLeft` o `rotateRight`), que ajustan la altura preservando el orden de búsqueda.
-5. Reparan los punteros del hijo y del padre tras una inserción que violó el invariante vertical.
+**Parte A**
+1. Las prioridades dictaminan estrictamente la jerarquía vertical (quién es padre o hijo), mientras que las claves (`key`) controlan exclusivamente la disposición lateral (menores a la izquierda, mayores a la derecha). El Treap respeta ambas invariantes en simultáneo.
+2. La raíz termina siendo, de forma innegociable, el elemento con la prioridad matemática más dominante de todo el conjunto de datos insertado.
+3. Al insertarse un nuevo nodo como hoja (siguiendo las normas del BST), si su valor de prioridad asignado es más dominante que el de su padre, rompe la invariante vertical del montículo y debe ser empujado hacia arriba (`bubbleUp`).
+4. El nodo escala niveles a través de rotaciones locales (`rotateLeft` o `rotateRight`). Estas operaciones intercambian las paternidades ajustando la altura sin quebrar en ningún momento el orden transversal del árbol de búsqueda.
+5. Principalmente los punteros de los descendientes (`left`, `right`) y del ancestro superior (`parent`), asegurando que la malla de memoria del grafo se suture correctamente tras el giro direccional.
 
-**Parte C y D:**
-1. En un BST normal, se podría borrar un nodo interno buscando a su sucesor. En un Treap, hacer eso directamente rompería la coherencia de prioridades con los subárboles sobrantes.
-2. Antes de borrar un nodo, se fuerza a descender (`trickleDown`) rotándolo con su hijo de mayor prioridad, hasta empujarlo a la posición de hoja, donde puede cortarse sin afectar a nadie.
-3. Las funciones de rango (como `findEQ`, `lowerBound`) son exactamente iguales a las de un Árbol de Búsqueda Binaria normal. Simplemente navegan comparando claves sin importarles el valor de la prioridad.
-4. El Treap evita la complejidad de implementar los engorrosos casos de rebalanceo de un árbol AVL o Red-Black. Delega el equilibrio a la probabilidad estadística, consiguiendo tiempos esperados `O(\log n)`.
-5. Errores típicos incluyen olvidar reasignar los punteros del padre (`parent`) después de una rotación, causando árboles huérfanos, o realizar una rotación hacia el lado equivocado, destruyendo la lateralidad del BST. Usar semillas estáticas en los tests ayuda a atrapar estos errores con entornos predecibles.
+**Parte B**
+1. Inyectar valores con prioridad extrema dominante obliga a un reacomodo ascendente forzoso. La clave asume la supremacía topológica abriéndose paso hacia la raíz rotando en contrasentido con sus predecesores directos.
+2. La escalada se frena en seco cuando el nodo emergente topa con un padre cuya prioridad sí legitima su dominancia jerárquica frente a él, o en su defecto, cuando alcanza la cúspide (raíz absoluta).
+3. El costo temporal esperado es `O(\log n)` gracias a la dispersión probabilística. Sin embargo, en un escenario matemáticamente adverso o degenerado, el costo límite será `O(h)`.
+4. El pivoteo transfiere subárboles enteros (el hijo interno cambia de tutela), pero conserva impecable la frontera paramétrica: los valores menores se mantienen aislados a la izquierda y los mayores a la derecha.
+5. Inyectar prioridades aleatorias estocásticas rompe los patrones de ingreso ordenados que causarían degeneraciones topológicas (árboles lineales). Permite un balance orgánico con eficiencia logarítmica sin el aplastante costo operacional de mantener estructuras rígidamente balanceadas como los AVL.
+
+**Parte C**
+1. Suprimir abruptamente un bloque interno con dos descendientes activos desarticularía la convergencia de prioridades en los subárboles remanentes. Es obligatorio forzar el hundimiento del nodo (`trickleDown`) hacia la periferia (como hoja o nodo de un solo hijo) antes de amputarlo con seguridad.
+2. Se evalúa a ambos descendientes del nodo a descartar y se elige aquel que posea la prioridad más alta. Este hijo es el único capacitado para tomar la corona local sin quedar subyugado erróneamente por el otro hermano.
+3. Ejerce obligatoriamente un giro hacia la derecha (`rotateRight`), ascendiendo al hijo izquierdo.
+4. Ejerce obligatoriamente un giro hacia la izquierda (`rotateLeft`), relevando la posición y ascendiendo al hijo derecho.
+5. Múltiples factores críticos: el mantenimiento de la invariante inorden (claves), la rectificación de la invariante de Heap (prioridades), la integridad de todos los enlaces `parent` en la estela de rotación, el reanclaje del puntero global `root_` si cambió la cima, y el descuento aritmético de la cota `size_`.
+
+**Parte D**
+1. Las operaciones de búsqueda horizontal barren la topología consultando exclusivamente las magnitudes de las llaves (`key`). Son ajenas e independientes de las alteraciones morfológicas impuestas por el vector vertical `priority`.
+2. Aquellas rutinas que exigen navegabilidad determinista sobre la magnitud de datos, tales como `findEQ`, `lowerBound`, `upperBound` y la recolección transversal secuencial (`inorderKeys()`).
+3. El núcleo de superioridad vertical entre progenitores y vástagos, la cual se audita de forma exhaustiva mediante la rutina asertiva `isHeapByPriority()`.
+4. El Treap demanda sobrecostos inherentes a su naturaleza de árbol enlazado: punteros, asignación de memoria dinámica no contigua y ciclos de rotación de punteros. Para una purga masiva donde solo importa destilar máximos, el mapeo indexado sobre arreglos de `PQ_ComplHeap` aniquila estos tiempos por su aprovechamiento absoluto de la memoria caché.
+5. Resulta la arquitectura de elección cuando la operativa exige un híbrido implacable: rangos de consulta estructurados y flujos continuos de inserción/eliminación sin la abrumadora complejidad algorítmica y los estrictos cuellos de botella rotacionales de un Red-Black Tree.
+6. Errores catastróficos abarcan obviar la reasignación simétrica de los apuntadores `parent` tras rotar (desatando fugas de memoria o *segmentation faults* directos) o pivotear en el sentido inverso, lo cual destruye la invariante inorden. Fomentar pruebas sobre semillas de pseudo-aleatoriedad estáticas instaura ecosistemas reproducibles que permiten atrapar estas fisuras lógicas sin depender de la suerte.
 
 ### Bloque 11 - Comparación con Semana 5
-[Tabla y selección de estructura]
+```cpp
+int main() {
+    cout << "=========================================================\n";
+    cout << " Bloque 11 - Comparativa: Semana 5 vs Semana 6\n";
+    cout << "=========================================================\n\n";
+
+    // Conjunto de datos base para las pruebas
+    vector<int> datos = {50, 20, 70, 10, 30, 60, 80, 5, 15, 90};
+    
+    cout << "Datos de prueba inyectados: ";
+    printVector(datos, "Original");
+    cout << "\n";
+
+    /* ------------------------------------------------------------------
+     * 1. BinaryHeap (Semana 5) - Montículo tradicional
+     * ------------------------------------------------------------------ */
+    cout << "--- 1. BinaryHeap (Semana 5) ---\n";
+    ods::BinaryHeap<int> bh;
+    for (int x : datos) bh.add(x);
+    
+    cout << "Propiedad: Prioridad Pura (Monticulo base)\n";
+    cout << "Extrayendo minimos O(log n): [";
+    while(bh.size() > 0) {
+        cout << bh.remove() << (bh.size() > 0 ? ", " : "");
+    }
+    cout << "]\nIneficiencia: Carente de metodos de busqueda lateral (find).\n\n";
+
+    /* ------------------------------------------------------------------
+     * 2. PQ_ComplHeap (Semana 6) - Montículo implícito en arreglo
+     * ------------------------------------------------------------------ */
+    cout << "--- 2. PQ_ComplHeap (Semana 6) ---\n";
+    ods::PQ_ComplHeap<int, std::greater<int>> pq; // Usamos greater para simular min-heap
+    for (int x : datos) pq.insert(x);
+    
+    cout << "Propiedad: Monticulo Implicito Contiguo (Alta localidad en Cache)\n";
+    // Utilizamos el validador instrumentado que hiciste en el Bloque 5
+    cout << "Validacion Interna de Invariante: " << boolalpha << ods::complHeapIsValid(pq.data(), std::greater<int>{}) << "\n";
+    cout << "Extrayendo prioridades (delMax): [";
+    while(!pq.empty()) {
+        cout << pq.delMax() << (pq.empty() ? "" : ", ");
+    }
+    cout << "]\n\n";
+
+    /* ------------------------------------------------------------------
+     * 3. BinarySearchTree (Semana 5) - Árbol de búsqueda puro
+     * ------------------------------------------------------------------ */
+    cout << "--- 3. BinarySearchTree (Semana 5) ---\n";
+    ods::BinarySearchTree<int> bst;
+    for (int x : datos) bst.add(x);
+    
+    cout << "Propiedad: Lateralidad estricta (Busqueda de rangos)\n";
+    cout << "Busqueda findEQ(30): " << (bst.findEQ(30) ? "Exito" : "Fallo") << "\n";
+    cout << "Busqueda lowerBound(65): " << bst.lowerBound(65) << "\n";
+    cout << "Ineficiencia: Se degrada a O(n) si se insertan datos ya ordenados.\n\n";
+
+    /* ------------------------------------------------------------------
+     * 4. Treap (Semana 6) - Simbiosis BST + Heap
+     * ------------------------------------------------------------------ */
+    cout << "--- 4. Treap (Semana 6) ---\n";
+    ods::Treap<int> treap(232); // Inicializado con semilla estatica para testing
+    for (int x : datos) treap.add(x); // Genera prioridades internas aleatorias
+    
+    cout << "Propiedad: Simbiosis BST (Lateral) + Heap por Prioridad (Vertical)\n";
+    printVector(treap.inorderKeys(), "Recorrido Inorden (Claves)");
+    
+    // Invocando las validaciones estrictas del Bloque 10
+    cout << "Auditoria de Invariantes:\n";
+    cout << "  -> isBST (Orden lateral): " << boolalpha << treap.isBST() << "\n";
+    cout << "  -> isHeapByPriority (Prioridad Vertical): " << treap.isHeapByPriority() << "\n";
+    cout << "  -> hasValidParentLinks (Ausencia de orfandad): " << treap.hasValidParentLinks() << "\n";
+    
+    cout << "Consultas hibridas:\n";
+    cout << "  -> findEQ(30): " << (treap.findEQ(30) ? "Encontrado" : "No encontrado") << "\n";
+    
+    // Probamos el remove instrumentado
+    size_t rotations = treap.removeCount(70);
+    cout << "  -> trickleDownCount al eliminar(70): " << rotations << " rotaciones ejecutadas.\n";
+    cout << "  -> isBST post-eliminacion: " << treap.isBST() << "\n";
+
+    cout << "\n=========================================================\n";
+    cout << " Conclusion demostrada: El Treap retiene la navegacion de \n";
+    cout << " busqueda del BST, blindandose de la degeneracion O(n) al \n";
+    cout << " acatar las prioridades estocasticas de la estructura Heap.\n";
+    cout << "=========================================================\n";
+
+    return 0;
+}
+```
+
+```
+=========================================================
+ Bloque 11 - Comparativa: Semana 5 vs Semana 6
+=========================================================
+
+Datos de prueba inyectados: Original: [50, 20, 70, 10, 30, 60, 80, 5, 15, 90]
+
+--- 1. BinaryHeap (Semana 5) ---
+Propiedad: Prioridad Pura (Monticulo base)
+Extrayendo minimos O(log n): [5, 10, 15, 20, 30, 50, 60, 70, 80, 90]
+Ineficiencia: Carente de metodos de busqueda lateral (find).
+
+--- 2. PQ_ComplHeap (Semana 6) ---
+Propiedad: Monticulo Implicito Contiguo (Alta localidad en Cache)
+Validacion Interna de Invariante: true
+Extrayendo prioridades (delMax): [5, 10, 15, 20, 30, 50, 60, 70, 80, 90]
+
+--- 3. BinarySearchTree (Semana 5) ---
+Propiedad: Lateralidad estricta (Busqueda de rangos)
+Busqueda findEQ(30): Exito
+Busqueda lowerBound(65): 0x6086508d2830
+Ineficiencia: Se degrada a O(n) si se insertan datos ya ordenados.
+
+--- 4. Treap (Semana 6) ---
+Propiedad: Simbiosis BST (Lateral) + Heap por Prioridad (Vertical)
+Recorrido Inorden (Claves): [5, 10, 15, 20, 30, 50, 60, 70, 80, 90]
+Auditoria de Invariantes:
+  -> isBST (Orden lateral): true
+  -> isHeapByPriority (Prioridad Vertical): true
+  -> hasValidParentLinks (Ausencia de orfandad): true
+Consultas hibridas:
+  -> findEQ(30): Encontrado
+  -> trickleDownCount al eliminar(70): 1 rotaciones ejecutadas.
+  -> isBST post-eliminacion: true
+
+=========================================================
+ Conclusion demostrada: El Treap retiene la navegacion de 
+ busqueda del BST, blindandose de la degeneracion O(n) al 
+ acatar las prioridades estocasticas de la estructura Heap.
+=========================================================
+```
+
+|Estructura|Operación principal|Propiedad mantenida|Operación eficiente|Operación que no conviene|Evidencia producida por la demostración|
+|-------|-------|-------|-------|-------|-------|
+|**`BinaryHeap` (Semana 5)**|Extracción del máximo/mínimo|Invariante vertical pura (Padre $\ge$ Hijos)|`remove()` / `add()` en `O(\log n)`|Búsqueda lateral o inorden `O(n)`|Trazas de `remove` ordenadas, fallos al intentar ubicar rangos.|
+|**`PQ_ComplHeap` (Semana 6)**|Gestión de cola de prioridad sobre vector|Montículo implícito contiguo|`delMax()` y localidad en caché `O(1)`|Iteraciones secuenciales crecientes|Extracciones fluidas y validación estricta de jerarquías sobre índices.|
+|**`BinarySearchTree` (Sem 5)**|Búsqueda ordenada y de rangos|Lateralidad estricta (L $<$ P $<$ R)|`lowerBound` / `upperBound` en `O(h)`|Extracción masiva continua de extremos|Consultas `findEQ` y `lowerBound` exitosas y directas.|
+|**`Treap` (Semana 6)**|Simbiosis BST y Heap|Orden lateral (BST) + Prioridad (Heap)|Rebalanceo orgánico `O(\log n)`|Operaciones sobre caché exigente (punteros dispersos)|Mantenimiento simultáneo de `isBST` y `isHeapByPriority` tras inserciones.|
+
+1. El heap de prioridad restringe los datos de forma vertical (un padre siempre es mayor/menor que sus hijos) sin correlación entre hermanos. El árbol de búsqueda restringe los datos de forma lateral (todo lo izquierdo es menor, todo lo derecho es mayor), permitiendo ubicar valores exactos descartando mitades lógicas.
+2.  Porque el BST garantiza un orden absoluto global de izquierda a derecha. En un heap, un valor grande puede alojarse arbitrariamente tanto en la profundidad de la rama izquierda como en la derecha, haciendo imposible un recorrido unidireccional creciente.
+3. Agrega eficiencia a nivel de hardware. Al proyectar el montículo sobre un arreglo implícito contiguo (`std::vector`) y usar funciones precompiladas (`constexpr`) para la aritmética de fronteras, maximiza la localidad en caché y elimina la latencia de punteros dinámicos.
+4. Combina la navegabilidad lateral estricta de un BST (para las claves o *keys*) con la dominancia vertical de un Heap (asignada mediante una prioridad aleatoria), utilizando rotaciones para satisfacer ambas reglas en paralelo.
+5.  Utilizaría `PQ_ComplHeap`, dado que su arquitectura sobre vectores contiguos domina los tiempos de ejecución para purgas continuas de la cima.
+6.  Utilizaría un `BinarySearchTree` (o su variante balanceada), ya que su naturaleza lateral es la única capaz de descartar subárboles para ubicar fronteras numéricas exactas.
+7.  Utilizaría el `Treap`. Evita la complejidad de codificar rebalanceadores estrictos (AVL o Red-Black) y delega el equilibrio a distribuciones estadísticas de prioridad, conservando asintóticas eficientes `O(\log n)`.
+
+La elección arquitectónica depende del flujo utilitario: para purgas masivas y estáticas de extremos, el arreglo implícito de `PQ_ComplHeap` rige incontestable; para auditorías analíticas ordenadas y escaneos de rangos discretos con inserciones concurrentes, el modelo híbrido probabilístico del `Treap` se impone al evitar degeneraciones lineales.
 
 ### Bloque 12 - Pruebas
-[Lista de pruebas, salida de ctest y explicación]
 
-### Bloque 13 - Defensa escrita
-[Respuesta final]
+```cpp
+#include <algorithm>
+#include <cassert>
+#include <memory>
+#include <vector>
+
+#include "Capitulo5.h"
+#include "Capitulo6.h"
+
+int main() {
+  // PQ_ComplHeap: secuencia completa de extracciones.
+  ods::PQ_ComplHeap<int> pq;
+  for (int x : {8, 3, 10, 1, 6, 14, 4, 7, 13, 14}) {
+    pq.insert(x);
+    assert(pq.isHeap());
+  }
+  std::vector<int> out;
+  while (!pq.empty()) {
+    out.push_back(pq.delMax());
+    assert(pq.empty()||pq.isHeap());
+  }
+  assert((out == std::vector<int>{14, 14, 13, 10, 8, 7, 6, 4, 3, 1}));
+
+  // Leftist heap: merge e invariantes.
+  ods::PQ_LeftHeap<int> a{20, 7, 18, 3};
+  ods::PQ_LeftHeap<int> b{19, 8, 4, 1, 17};
+  a.merge(b);
+  assert(a.isLeftistHeap());
+  assert(b.empty());
+  std::vector<int> leftOut;
+  while (!a.empty()) {
+    leftOut.push_back(a.delMax());
+    assert(a.empty()||a.isLeftistHeap());
+  }
+  assert((leftOut == std::vector<int>{20, 19, 18, 17, 8, 7, 4, 3, 1}));
+
+  // Huffman con heap completo y leftist heap deben tener mismo costo ponderado.
+  const std::vector<ods::HuffmanSymbol> s{{'a', 45}, {'b', 13}, {'c', 12},
+                                          {'d', 16}, {'e', 9},  {'f', 5}};
+  const auto codes1 = ods::huffmanGenerateCodes(s);
+  const auto codes2 = ods::huffmanGenerateCodesLeftHeap(s);
+  assert(ods::huffmanIsPrefixFree(codes1));
+  assert(ods::huffmanIsPrefixFree(codes2));
+  assert(ods::huffmanWeightedPathLength(s, codes1) == 224);
+  assert(ods::huffmanWeightedPathLength(s, codes2) == 224);
+
+  // Rotaciones BST: preservan inorder aun cuando cambie la forma.
+  ods::BinarySearchTree<int> bst;
+  for (int x : {8, 3, 10, 1, 6, 14, 4, 7, 13}) {
+    bst.add(x);
+  }
+  auto sorted = bst.inorder();
+  bst.rotateLeft(bst.root());
+  assert(bst.isBST());
+  assert(bst.inorder() == sorted);
+  bst.rotateRight(bst.root());
+  assert(bst.isBST());
+  assert(bst.inorder() == sorted);
+
+  // Treap: BST por clave + heap por prioridad.
+  ods::Treap<int> treap(555);
+  treap.addWithPriority(8, 80);
+  treap.addWithPriority(3, 40);
+  treap.addWithPriority(10, 90);
+  treap.addWithPriority(1, 20);
+  treap.addWithPriority(6, 70);
+  treap.addWithPriority(14, 120);
+  treap.addWithPriority(4, 65);
+  treap.addWithPriority(7, 68);
+  assert(treap.isTreap());
+  assert((treap.inorderKeys() == std::vector<int>{1, 3, 4, 6, 7, 8, 10, 14}));
+  assert(treap.lowerBound(5)->key == 6);
+  assert(treap.upperBound(6)->key == 7);
+  assert(treap.remove(3));
+  assert(treap.remove(8));
+  assert(treap.isTreap());
+  assert((treap.inorderKeys() == std::vector<int>{1, 4, 6, 7, 10, 14}));
+}
+```
+```cpp
+#include <vector>
+#include <cassert>
+#include <string>
+
+#include "Capitulo6.h"
+
+using namespace std;
+using namespace ods;
+
+void test_complheap_invariants() {
+    PQ_ComplHeap<int> heap;
+    vector<int> inputs = {45, 20, 80, 10, 90, 30, 60, 50, 70};
+
+    // PQ_ComplHeap conserva la propiedad heap después de cada inserción.
+    for (int v : inputs) {
+        heap.insert(v);
+        assert(heap.isHeap()); 
+    }
+
+    // PQ_ComplHeap conserva la propiedad heap después de cada eliminación.
+    while (!heap.empty()) {
+        heap.delMax();
+        if (!heap.empty()) {
+            assert(heap.isHeap());
+        }
+    }
+}
+
+void test_heapify_floyd_invariants() {
+    // heapifyFloyd produce un heap válido.
+    vector<int> raw_data = {15, 3, 18, 9, 21, 6, 12, 4, 8, 2};
+    complHeapHeapifyFloyd(raw_data, std::less<int>{});
+    
+    assert(complHeapIsValid(raw_data, std::less<int>{}));
+}
+
+void test_leftheap_invariants() {
+    PQ_LeftHeap<int> h1;
+    PQ_LeftHeap<int> h2;
+
+    // PQ_LeftHeap conserva su propiedad después de insert.
+    h1.insert(50);
+    assert(h1.isValidLeftHeap());
+    h1.insert(30);
+    assert(h1.isValidLeftHeap());
+    h1.insert(70);
+    assert(h1.isValidLeftHeap());
+
+    h2.insert(40);
+    h2.insert(20);
+    h2.insert(60);
+    assert(h2.isValidLeftHeap());
+
+    // PQ_LeftHeap conserva su propiedad después de merge.
+    h1.merge(h2);
+    assert(h1.isValidLeftHeap());
+
+    // PQ_LeftHeap conserva su propiedad después de delMax.
+    while (!h1.empty()) {
+        h1.delMax();
+        if (!h1.empty()) {
+            assert(h1.isValidLeftHeap());
+        }
+    }
+}
+
+void test_huffman_invariants() {
+    vector<HuffmanSymbol> alphabet = {
+        {'A', 45}, {'B', 13}, {'C', 12}, {'D', 16}, {'E', 9}, {'F', 5}
+    };
+    
+    auto codes = huffmanGenerateCodes(alphabet);
+
+    // Huffman produce códigos libres de prefijos.
+    assert(huffmanIsPrefixFree(codes));
+
+    // Huffman maneja correctamente el caso de un solo símbolo.
+    vector<HuffmanSymbol> single_symbol = {{'Z', 100}};
+    auto single_codes = huffmanGenerateCodes(single_symbol);
+    
+    assert(single_codes.size() == 1);
+    assert(single_codes['Z'] == "0"); 
+    assert(huffmanIsPrefixFree(single_codes));
+}
+
+void test_treap_invariants() {
+    Treap<int> treap(12345); 
+    vector<int> keys = {55, 22, 88, 11, 33, 66, 99, 44, 77};
+
+    for (int k : keys) {
+        treap.add(k);
+        // PRUEBA: Treap conserva propiedad BST después de insertar.
+        assert(treap.isBST());
+        // PRUEBA: Treap conserva propiedad de heap por prioridad después de insertar.
+        assert(treap.isHeapByPriority());
+        assert(treap.hasValidParentLinks());
+    }
+
+    for (int k : keys) {
+        treap.remove(k);
+        // Treap conserva ambas propiedades después de eliminar.
+        if (!treap.empty()) {
+            assert(treap.isBST());
+            assert(treap.isHeapByPriority());
+            assert(treap.hasValidParentLinks());
+        }
+    }
+}
+
+int main() {
+    test_complheap_invariants();
+    test_heapify_floyd_invariants();
+    test_leftheap_invariants();
+    test_huffman_invariants();
+    test_treap_invariants();
+    return 0;
+}
+```
+
+**Resultado ctest:**
+```
+Test project .../build
+    Start 1: semana6_public
+1/2 Test #1: semana6_public ............   Passed    0.01 sec
+    Start 2: semana6_internal
+2/2 Test #2: semana6_internal ..........   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 2
+```
+
+* **Alteración de tamaño (`getMax` y `delMax`):** Atrapa inconsistencias en el estado interno del arreglo. Evita que consultas de solo lectura muten la estructura y que eliminaciones reales olviden actualizar el contador lógico, lo cual dejaría "basura" accesible en memoria.
+* **Ordenamiento inestable (`heapSort`):** Previene bugs lógicos donde los valores duplicados provocan ciclos infinitos o sobrescrituras destructivas al intercambiar posiciones a gran distancia.
+* **Mantenimiento de invariantes (`PQ_ComplHeap`):** Detecta fallos en la lógica de `percolateUp` y `percolateDown`. Atrapa casos donde el nodo se intercambia con el hijo equivocado o donde la iteración se detiene antes de restaurar por completo la jerarquía.
+* **Ensamblaje top-down (`heapifyFloyd`):** Asegura que el barrido inverso `(n/2 - 1)` no omita ningún nodo interno crítico, previniendo que los subárboles superiores queden desalineados respecto a las hojas.
+* **Inclinación izquierda (`PQ_LeftHeap`):** Detecta errores matemáticos al actualizar o comparar el *Null Path Length* (NPL). Un fallo aquí haría que el árbol gane peso en la rama derecha, destruyendo la garantía de tiempo logarítmico en las fusiones.
+* **Construcción de diccionarios (`Huffman`):** Atrapa *segmentation faults* generados por alfabetos de un solo símbolo y previene bucles muertos si la estructura intenta procesar caracteres con frecuencia nula.
+* **Seguridad de decodificación (*Prefix-Free* en `Huffman`):** Detecta asignaciones recursivas defectuosas (por ejemplo, asignar el mismo bit a ambas ramas), lo que generaría códigos ambiguos imposibles de decodificar sin usar separadores.
+* **Simbiosis estructural (`Treap`):** Atrapa el clásico error de aplicar una rotación en sentido inverso, lo que restauraría la prioridad pero destruiría el orden lateral (BST). También detecta amputaciones prematuras que olvidan realizar el `trickleDown` hacia las hojas antes de liberar la memoria del nodo.
+
+## Bloque 13 - Defensa escrita
+
+Modificar directamente el código fuente de estas estructuras demuestra que programar topologías a bajo nivel otorga una comprensión que la simple revisión teórica no puede ofrecer. A nivel de arquitectura de software, trabajar bajo la interfaz genérica `PQ` me comprobó la eficacia del polimorfismo: el contrato operativo que garantiza insertar y extraer según una prioridad se mantiene inviolable frente al usuario, encapsulando por completo la complejidad de la topología interna elegida.
+
+Al operar sobre la representación implícita del heap binario completo, resulta evidente la brutal ventaja de rendimiento que se obtiene al prescindir de punteros dinámicos. Usar un vector continuo y aritmética simple (`2i+1`, `(i-1)/2`) saca el máximo provecho de la localidad de la memoria caché. En esta estructura, comprobé que `percolateUp` es una maniobra ligera, ya que el nodo escala naturalmente verificando a un único ancestro directo. Por el contrario, codificar `percolateDown` expone la fragilidad crítica de la estructura: elegir al hijo equivocado para el hundimiento corrompería todo el subárbol subyacente. Frente a estas operaciones unitarias, implementar el `heapify` de Floyd demuestra ser una genialidad algorítmica; omitir la inmensa base de hojas y procesar los nodos internamente hacia arriba consolida la estructura entera en un eficiente tiempo `O(n)`. Respaldado por este concepto, adaptar `heapSort` muestra la elegancia del reciclaje de recursos, logrando ordenar *in-situ* al desterrar las cimas extraídas hacia los límites lógicos del arreglo, con cero fragmentación de memoria adicional.
+
+Por otro lado, implementar la operación `merge` en el heap izquierdista obliga a replantear el concepto de equilibrio. Forzar deliberadamente una asimetría para cargar el peso en la rama izquierda (vía NPL) no es una falla, sino la clave de diseño que permite fusionar ramales derechos de manera garantizada en tiempo `O(\log n)`. Esta fusión veloz demuestra su valor en entornos industriales como la codificación de Huffman, donde delegar el emparejamiento codicioso de frecuencias a una cola de prioridad no solo agiliza la compresión, sino que asegura matemáticamente un árbol de diccionarios estrictamente libre de prefijos.
+
+Finalmente, integrar un **`Treap`** me dejó claro que las rotaciones no están limitadas a costosos rebalanceos deterministas. Aquí, las rotaciones funcionan como el mecanismo perfecto para propulsar un nodo y satisfacer su prioridad vertical probabilística, manteniendo intacta la lateralidad requerida para ejecutar búsquedas ordenadas ágiles. Al realizar la comparación con `BinaryHeap` y el `BinarySearchTree`*clásico de la Semana 5, se concluye que no hay una estructura universalmente superior, sino decisiones basadas en el flujo operativo: el arreglo contiguo domina la purga rápida de cimas, mientras que las estructuras enlazadas son imprescindibles si se requieren consultas de rango (*lower/upper bounds*). Todo esto deja claro que diseñar pruebas unitarias, auditar invariantes lógicas y blindar casos borde es una disciplina ingenieril ineludible. Validar rigurosamente cada estado es la única garantía de que estas estructuras soportarán la carga de un entorno real sin desplomarse por fugas de memoria o degradación asintótica.
